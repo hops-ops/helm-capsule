@@ -1,0 +1,44 @@
+# code: language=yaml
+#
+# Helm release for Capsule
+#
+# Capsule provides:
+# - Multi-tenancy and policy-based framework for Kubernetes
+# - Lightweight tenant abstraction (grouping of namespaces)
+# - Resource quotas and limits per tenant
+# - Network policies and RBAC isolation
+#
+
+{{- $capsule := $state.capsule }}
+
+---
+apiVersion: helm.m.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: {{ $capsule.releaseName }}
+  annotations:
+    {{ setResourceNameAnnotation "helm-release-capsule" }}
+  labels: {{ $capsule.labels | toJson }}
+spec:
+  managementPolicies: {{ $capsule.managementPolicies | toJson }}
+  forProvider:
+    chart:
+      name: capsule
+      repository: https://projectcapsule.github.io/charts
+      version: "0.12.4"
+    namespace: {{ $capsule.namespace }}
+    {{- if $capsule.overrideAllValues }}
+    values:
+      {{- toYaml $capsule.overrideAllValues | nindent 6 }}
+    {{- else }}
+    values:
+      fullnameOverride: capsule
+      nameOverride: capsule
+      {{- if $capsule.values }}
+      {{- toYaml $capsule.values | nindent 6 }}
+      {{- end }}
+    {{- end }}
+  rollbackLimit: 3
+  providerConfigRef:
+    name: {{ $capsule.providerConfigRef.name }}
+    kind: {{ $capsule.providerConfigRef.kind }}

@@ -1,0 +1,23 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: Capsule
+metadata:
+  name: capsule
+  namespace: example-env
+spec:
+  clusterName: example-cluster
+
+  labels:
+    team: platform
+
+  helm:
+    namespace: capsule-system
+    name: capsule
+    values:
+      manager:
+        options:
+          # Allow capsule to manage all namespaces
+          forceTenantPrefix: false
+          # Enable protected namespace regex
+          protectedNamespaceRegex: "^kube-|^default$|^capsule-"
+      serviceMonitor:
+        enabled: true

@@ -1,0 +1,7 @@
+apiVersion: helm.hops.ops.com.ai/v1alpha1
+kind: Capsule
+metadata:
+  name: capsule
+  namespace: example-env
+spec:
+  clusterName: example-cluster
